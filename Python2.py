@@ -79,15 +79,15 @@ def main():
     for i in xrange(net.numInputs):
         for y in xrange(net.numHidden):
             # does this 4 need to be changes?
-            net.ihWeights[i][y] = wandb[i * 4 + y]
+            net.ihWeights[i][y] = wandb[i * net.numHidden + y]
     for i in xrange(net.numHidden):
         for y in xrange(net.numOutput):
-            # this 2?
-            net.hoWeights[i][y] = wandb[12 + i * 2 + y]
+            net.hoWeights[i][y] = wandb[(net.numHidden * net.numInputs) + i * net.numOutput + y]
     for i in xrange(net.numHidden):
-        net.ihBiases[i] = wandb[20 + i]
+        net.ihBiases[i] = wandb[(net.numHidden * net.numInputs + (net.numHidden * net.numOutput)) + i]
     for i in xrange(net.numOutput):
-        net.hoBiases[i] = wandb[24 + i]
+        # prev + hidden
+        net.hoBiases[i] = wandb[(net.numHidden * net.numInputs + (net.numHidden * net.numOutput))+ net.numHidden + i]
     for i in xrange(300):
         localout, hlocalout,inputstuff = ComputeOutputs(net)
         ComputeBackPropogation(localout, hlocalout, net)
@@ -125,7 +125,7 @@ def ComputeOutputs(net):
     local = [0 for x in xrange(net.numHidden)]
     endresult = [0 for x in xrange(net.numOutput)]
     # why is this a 4 and not a three?
-    inputstuff = [0 for x in xrange(4)]
+    inputstuff = [0 for x in xrange(net.numHidden)]
     for i in xrange(net.numHidden):
         sumi = 0
         for x in xrange(net.numInputs):
