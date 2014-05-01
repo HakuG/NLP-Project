@@ -10,26 +10,42 @@ import math
 class NeuralNetwork:
     
     def __init__(self, numInputs, numHidden, numOutput, eta, alpha):
+        # parameters
         self.numInputs = numInputs
         self.numHidden = numHidden
         self.numOutput = numOutput
-        self.inputs = [0 for x in xrange (numInputs)]
-        self.ihWeights = [[0 for x in xrange(numHidden)] for y in xrange(numInputs)]
-        self.hoWeights = [[0 for x in xrange(numOutput)] for y in xrange(numHidden)]
-        self.ihSums = [0 for x in xrange(numHidden)]
-        self.ihBiases = [0 for x in xrange(numHidden)]        
-        self.hoSums = [0 for x in xrange(numOutput)]
-        self.hoBiases = [0 for x in xrange(numOutput)]
-        self.outputs = [0 for x in xrange(numOutput)]
-        self.oGrads = [0 for x in xrange(numOutput)]
-        self.hGrads = [0 for x in xrange(numHidden)]
-        self.ihWeightsDelta = [[0 for x in xrange(numHidden)] for y in xrange(numInputs)]
-        self.ihBiasesDelta = [0 for x in xrange(numHidden)]
-        self.hoWeightsDelta = [[0 for x in xrange(numOutput)] for y in xrange(numHidden)]
-        self.hoBiasesDelta = [0 for x in xrange(numOutput)]
         self.eta = eta
-        self.alpha = alpha        
-    
+        self.alpha = alpha
+        # initialize empty array for inputs
+        self.inputs = [0 for x in xrange (numInputs)]
+        # initialize array of empty arrays for input to hidden weights
+        self.ihWeights = [[0 for x in xrange(numHidden)] for y in xrange(numInputs)]
+        # initialize array of empty arrays for hidden to output weights
+        self.hoWeights = [[0 for x in xrange(numOutput)] for y in xrange(numHidden)]
+        # initialize an empty array for for sums of hidens
+        self.ihSums = [0 for x in xrange(numHidden)]
+        # initialize empty array for Biases of hiddens
+        self.ihBiases = [0 for x in xrange(numHidden)]
+        #initlaize empty array for Sums of outputs        
+        self.hoSums = [0 for x in xrange(numOutput)]
+        # initialize empty array for Biases of outputs 
+        self.hoBiases = [0 for x in xrange(numOutput)]
+        # initialize empty array for outputs
+        self.outputs = [0 for x in xrange(numOutput)]
+        # initialize empty array for gradients of outputs
+        self.oGrads = [0 for x in xrange(numOutput)]
+        # initialize empty array for gradients of hiddens
+        self.hGrads = [0 for x in xrange(numHidden)]
+        # initialize array of empty arrays corresponding to change in weights from inputs to hidden
+        self.ihWeightsDelta = [[0 for x in xrange(numHidden)] for y in xrange(numInputs)]
+        # initialize empty array for change in biases for Hiddens.
+        self.ihBiasesDelta = [0 for x in xrange(numHidden)]
+        # initialize array of empty arrays for change in weights from hidden to outputs
+        self.hoWeightsDelta = [[0 for x in xrange(numOutput)] for y in xrange(numHidden)]
+        # initialize empty array for change in biases for Outputs
+        self.hoBiasesDelta = [0 for x in xrange(numOutput)]
+                
+    # Sigmoid function conducts the input to hidden computation
     @staticmethod
     def SigmoidFunction (x):
         if x <-45:
@@ -38,6 +54,8 @@ class NeuralNetwork:
             return 1.0
         else:
             return 1.0/(1.0 + math.exp(-x))
+
+    # Hyperbolic Tangent Function conducts the hidden to output computation
     @staticmethod
     def HTF(x):
         if x < -10:
@@ -48,45 +66,43 @@ class NeuralNetwork:
             return math.tanh(x)
             
 def main():
-
-    # print("We will be building a 3 - 4 - 2 neural network.")
-    # print("What are the initial 26 random weights and biases?")
-    # print("What are the three inputs broski?")
-    # print("What is the target output to learn?")
-    # print("What is eta and alpha?")
-
-    #initializing everything
     # get number of input nodes
     input_nodes = int(raw_input("How many input nodes?\n"))
     # get number of hidden nodes
     hidden_nodes = int(raw_input("How many hidden nodes?\n"))
     # get number of outpus nodes
-    output_nodes = int(raw_input("How many input nodes?\n"))
+    output_nodes = int(raw_input("How many output nodes?\n"))
+    # Compute the number of weights needed
+    weights_needed = hidden_nodes * (input_nodes + output_nodes)
+    # compute the number of biases needed
+    biases_needed = hidden_nodes + output_nodes
     # get weights and biases
-    wandb = map(float, raw_input("What are the initial 26 random weights and biases?\n").split())
+    wandb = map(float, raw_input("What are the initial random %s weights %s biases?\n" % (weights_needed, biases_needed)).split())
     # get inputs
-    inputs = map(float, raw_input("What are the inputs?\n").split())
+    inputs = map(float, raw_input("What are the %s inputs?\n" % input_nodes).split())
     # get outputs
-    outputs = map(float, raw_input("What are the target outputs to learn?\n").split())
+    outputs = map(float, raw_input("What are the %s target outputs to learn?\n" % output_nodes).split())
     # get eta
     eta = float(raw_input("What is the eta?\n"))
     # get alpha
     alpha = float(raw_input("What is alpha?\n"))
-
+    # create Neural Network
     net = NeuralNetwork(input_nodes, hidden_nodes, output_nodes, eta, alpha)
     net.inputs = inputs
     net.outputs = outputs
+    #  fill input to hidden array with initial weights
     for i in xrange(net.numInputs):
         for y in xrange(net.numHidden):
-            # does this 4 need to be changes?
             net.ihWeights[i][y] = wandb[i * net.numHidden + y]
+    # fill hidden to output array with initial weights
     for i in xrange(net.numHidden):
         for y in xrange(net.numOutput):
             net.hoWeights[i][y] = wandb[(net.numHidden * net.numInputs) + i * net.numOutput + y]
+    # fill input to hidden array with initial biases
     for i in xrange(net.numHidden):
         net.ihBiases[i] = wandb[(net.numHidden * net.numInputs + (net.numHidden * net.numOutput)) + i]
+    # fill hidden to output array with initial biases
     for i in xrange(net.numOutput):
-        # prev + hidden
         net.hoBiases[i] = wandb[(net.numHidden * net.numInputs + (net.numHidden * net.numOutput))+ net.numHidden + i]
     for i in xrange(300):
         localout, hlocalout,inputstuff = ComputeOutputs(net)
@@ -124,7 +140,6 @@ def ComputeBackPropogation(localout, hlocalout, net):
 def ComputeOutputs(net):
     local = [0 for x in xrange(net.numHidden)]
     endresult = [0 for x in xrange(net.numOutput)]
-    # why is this a 4 and not a three?
     inputstuff = [0 for x in xrange(net.numHidden)]
     for i in xrange(net.numHidden):
         sumi = 0
