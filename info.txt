@@ -1,2 +1,3 @@
 title: Customizable Neural Network w/ Back Propagation
-seas-usernames: jseaton, <harnek>
+None of the code is on code.seas, however my username is jseaton
+It is, however, on github. My username is jakeseaton.

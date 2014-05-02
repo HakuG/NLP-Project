@@ -1,2 +1,3 @@
-Just run blackbox.py. 
+Just run blackbox.py.
 The customization comes from changing the values in this file.
+To visualize the network converging, uncomment the print(endresult) at the bottom of Training.py

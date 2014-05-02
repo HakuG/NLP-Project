@@ -10,7 +10,6 @@ class trainingset:
         self.inputs = [0 for x in xrange(net.numInputs)]
         # number of needed outputs
         self.outputs = [0 for x in xrange(net.numOutput)]
-        
         self.wandb = self.weights + self.biases
 
 def train(net,tset):
@@ -41,9 +40,11 @@ def train(net,tset):
         ComputeBackPropogation(localout, hlocalout, net)
         # update the weights
         ComputeWeightBiasDelta (net, inputstuff)
-    ComputeOutputs(net)
-    print "It converged to %s" % net.outputs
+    current_outputs, x, y = ComputeOutputs(net)
+    # print result and return
+    print "It converged to %s" % current_outputs
     return net
+
 def ComputeWeightBiasDelta (net,inputstuff):
     # get previous values
     prevdeltih = net.ihWeightsDelta
@@ -69,6 +70,7 @@ def ComputeWeightBiasDelta (net,inputstuff):
     for i in xrange(net.numOutput):
         net.hoBiasesDelta[i] = net.eta * net.oGrads[i]
         net.hoBiases[i] = net.hoBiases[i] + net.hoBiasesDelta[i] + net.alpha * prevdelthob[i]
+
 def ComputeBackPropogation(localout, hlocalout, net):
     # compute output gradients
     for i in xrange(net.numOutput):
@@ -79,10 +81,13 @@ def ComputeBackPropogation(localout, hlocalout, net):
         for i in xrange(net.numOutput):
             sumx = sumx + net.oGrads[i] * net.hoWeights[x][i]
         net.hGrads[x] = (hlocalout[x])*(1 - hlocalout[x])*(sumx)
+
+# Pushes inputs through the network
 def ComputeOutputs(net):
     local = [0 for x in xrange(net.numHidden)]
     endresult = [0 for x in xrange(net.numOutput)]
     inputstuff = [0 for x in xrange(net.numHidden)]
+    # Push to hidden layer
     for i in xrange(net.numHidden):
         sumi = 0
         for x in xrange(net.numInputs):
@@ -90,6 +95,7 @@ def ComputeOutputs(net):
         sumi = sumi + net.ihBiases[i]
         inputstuff[i] = sumi
         local[i] = net.SigmoidFunction(sumi)
+    # Push to output layer
     for i in xrange(net.numOutput):
         sumi = 0
         for x in xrange(net.numHidden):
