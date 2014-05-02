@@ -1,0 +1,2 @@
+title: Customizable Neural Network w/ Back Propagation
+seas-usernames: jseaton, <harnek>
